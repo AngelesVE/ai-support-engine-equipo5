@@ -15,6 +15,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.contract import AnalyzeRequest, AnalyzeResponse
 
@@ -55,6 +56,15 @@ async def entrada_invalida(request: Request, exc: RequestValidationError):
         "Entrada inválida en: " + ", ".join(campos)
         + ". Se requiere message (texto no vacío) y mode ('traditional' o 'generative').",
     )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def error_http(request: Request, exc: StarletteHTTPException):
+    # Errores que lanza el propio framework (p. ej. cuerpo que no es UTF-8 válido
+    # o ruta inexistente): mismo formato {"error": ...} que el resto de la API.
+    if exc.status_code == 400:
+        return _error(422, "Entrada inválida: el cuerpo debe ser JSON en UTF-8.")
+    return _error(exc.status_code, str(exc.detail))
 
 
 @app.get("/health")

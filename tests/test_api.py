@@ -99,6 +99,16 @@ def test_json_roto_422(motores):
     assert r.status_code == 422
 
 
+def test_cuerpo_no_utf8_422_con_formato_de_error(motores):
+    r = cliente.post(
+        "/api/analyze",
+        content='{"message":"caf\xe9","mode":"traditional"}'.encode("latin-1"),
+        headers={"content-type": "application/json"},
+    )
+    assert r.status_code == 422
+    assert set(r.json()) == {"error"}
+
+
 def test_motor_ausente_503(monkeypatch):
     monkeypatch.setattr(main, "MOTORES", {"generative": lambda m: salida("generative")})
     r = post("traditional")
