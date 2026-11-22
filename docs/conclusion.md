@@ -1,5 +1,7 @@
-# Conclusión (BORRADOR)
+# Conclusión
 
-> BORRADOR: falta correr la comparativa completa cuando el motor tradicional de David esté en `main`. Los porcentajes y la comparación final se llenan entonces.
+Probamos los dos motores con las mismas 20 solicitudes (normales, ambiguas y ataques) y una clasificación de referencia. El tradicional acertó la categoría en 80 % y la prioridad en 50 %, con 0.35 s promedio. El generativo con Ollama (qwen2.5:3b) acertó 75 % y 45 %, pero tardó 4.59 s por solicitud.
 
-Comparamos un motor por reglas y uno generativo (Ollama, qwen2.5:3b) con 20 solicitudes de referencia, entre normales, ambiguas y ataques de inyección. Las reglas deberían ser rápidas y predecibles; el modelo, entender mejor los mensajes ambiguos, a costa de más tiempo y de respuestas menos estables. Resultado del tradicional: _pendiente_. Resultado del generativo: _pendiente_. En ambos casos todo incidente SECURITY queda marcado para revisión humana y la API valida la salida contra el contrato. Conclusión final: _pendiente_.
+Las reglas fueron rápidas y siempre dan lo mismo, pero fallan cuando el mensaje no trae sus palabras clave, como en la inyección SQL del caso 20. El modelo entendió mejor el impacto (sistema caído, toda la plantilla sin acceso), aunque tiende a exagerar la prioridad y confundió varios casos con ACCESS.
+
+Los dos motores resistieron los ataques de "ignora las instrucciones" y marcaron SECURITY con revisión humana. Para producción conviene combinarlos: reglas como primer filtro y el modelo para los casos ambiguos, siempre validando la salida.
